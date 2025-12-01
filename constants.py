@@ -1,6 +1,6 @@
 from enum import Enum
 
 class PriceType(Enum):
-    ClosePrices = "Close"
+    Close = "Close"
     Adjusted = "Adj Close"
     Volume = "Volume"

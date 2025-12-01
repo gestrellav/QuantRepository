@@ -2,17 +2,17 @@ import pandas as pd
 from typing import Union
 import yfinance as yf
 import logging
-from enum import Enum
+from constants import PriceType
 
-
-
-class StockMarketData:
+class MarketData:
+    
     @staticmethod
-    def MarketData(
+    def get_market_data(
         tickers: list[str],
         start_date: str,
-        end_date: str
-    ) -> pd.DataFrame:
+        end_date: str,
+        price_type: PriceType = PriceType.Close # default
+    ) -> Union[pd.Series, pd.DataFrame]:
 
         logger = logging.getLogger("MarketData.Prices")
         logger.info("Starting market data download process.")
@@ -35,27 +35,37 @@ class StockMarketData:
             logger.error(msg)
             raise TypeError(msg)
 
-        logger.info(f"Tickers requested: {tickers}")
+        logger.info(f"Tickers to download: {tickers}")
         logger.info(f"Date range: {start_date} to {end_date}")
+        logger.info(f"Price type: {price_type.name}")
         
         # ===== Data Download ===== #
         try:
-            data = yf.download(
+            raw = yf.download(
                 tickers=tickers,
                 start=start_date,
                 end=end_date,
                 progress=False
             )
-            logger.info("Datos descargados exitosamente.")
-        except Exception as e:
-            logger.error(f"Error al descargar datos: {e}")
-            raise RuntimeError(f"Error al descargar datos: {e}")
-        
-        # Validar que 'Close' existe (yfinance a veces cambia estructura)
-        if "Close" not in data.columns:
-            raise ValueError("El DataFrame descargado no contiene la columna 'Close'.")
 
-        close_prices = data[Type.value]
+        except Exception as e:
+            logger.exception("Error downloading data from yfinance.")
+            raise RuntimeError(f"Error downloading data from yfinance. Exception: {e}")
+        
+        # ===== Extract Column ===== #
+        # Multiple tickers case
+        if isinstance(raw.columns, pd.MultiIndex):
+            if price_type.value not in raw.columns.get_level_values(0):
+                raise ValueError(f"'{price_type.value}' not found in downloaded data.")
+            marketdata = raw[price_type.value]
+        else:
+            # Single ticker case
+            if price_type.value not in raw.columns:
+                raise ValueError(f"'{price_type.value}' not found in downloaded data.")
+        
+        
+
+
 
         # Validar que no está vacío
         if close_prices.empty:
