@@ -50,29 +50,32 @@ class MarketData:
 
         except Exception as e:
             logger.exception("Error downloading data from yfinance.")
-            raise RuntimeError(f"Error downloading data from yfinance. Exception: {e}")
+            raise RuntimeError(
+                f"Error downloading data from yfinance. Exception: {e}"
+                )
         
         # ===== Extract Column ===== #
         # Multiple tickers case
-        if isinstance(raw.columns, pd.MultiIndex):
-            if price_type.value not in raw.columns.get_level_values(0):
-                raise ValueError(f"'{price_type.value}' not found in downloaded data.")
-            marketdata = raw[price_type.value]
+        if isinstance(raw.columns, pd.MultiIndex): # type: ignore
+            if price_type.value not in raw.columns.get_level_values(0): # type: ignore
+                raise ValueError(
+                    f"'{price_type.value}' not found in downloaded data."
+                )
+            marketdata = raw[price_type.value] # type: ignore
         else:
             # Single ticker case
-            if price_type.value not in raw.columns:
-                raise ValueError(f"'{price_type.value}' not found in downloaded data.")
+            if price_type.value not in raw.columns: # type: ignore
+                raise ValueError(
+                    f"'{price_type.value}' not found in downloaded data."
+                )
+            marketdata = raw[[price_type.value]].rename(columns={price_type.value: tickers[0]}) # type: ignore
         
+        if marketdata.empty:
+            raise ValueError(
+                "Requested price data is empty."
+            )
         
-
-
-
-        # Validar que no está vacío
-        if close_prices.empty:
-            raise ValueError("No se obtuvieron datos de mercado para los tickers especificados.")
-
-        # Convertir Series a DataFrame si solo viene 1 ticker
-        if isinstance(close_prices, pd.Series):
-            close_prices = close_prices.to_frame(name=tickers[0])
-
-        return close_prices
+        logger.info(
+            "Market data download and extraction completed successfully."
+        )
+        return marketdata

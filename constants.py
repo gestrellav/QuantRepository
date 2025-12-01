@@ -2,5 +2,8 @@ from enum import Enum
 
 class PriceType(Enum):
     Close = "Close"
-    Adjusted = "Adj Close"
     Volume = "Volume"
+    High = "High"
+    Low = "Low"
+    Open = "Open"
+    OHLC = ["Open", "High", "Low", "Close"]

@@ -1,17 +1,35 @@
 import pandas as pd
 from market_data import MarketData
 from quant_methods import QuantMethods
-from prefect import flow, task
+from constants import PriceType
 
-@flow
+
 def main():
     # Definir los parámetros
-    tickers = ["AAPL", "MSFT", "AMZN"]
+    tickers = [
+        "AAPL",
+        "MSFT",
+        "GOOGL",
+        "AMZN",
+        "TSLA",
+        "META",
+        "NVDA",
+        "JPM",
+        "V",
+        "DIS"
+    ]
+    
     start_date = "2023-01-01"
     end_date = "2023-12-31"
 
     # Obtener datos de mercado
-    data = MarketData.Prices(tickers, start_date, end_date) # type: ignore
+    data = MarketData.get_market_data(
+        tickers,
+        start_date,
+        end_date,
+        price_type=PriceType.Volume
+    ) # type: ignore
+    
     print("Datos de mercado descargados:")
     print(data.head())
     
