@@ -4,10 +4,7 @@ import yfinance as yf
 import logging
 from enum import Enum
 
-class PriceType(Enum):
-    ClosePrices = "Close"
-    Adjusted = "Adj Close"
-    Volume = "Volume"
+
 
 class StockMarketData:
     @staticmethod
