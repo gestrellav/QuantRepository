@@ -3,9 +3,16 @@ from typing import Union
 import yfinance as yf
 import logging
 from constants import PriceType
+from prefect import task
 
-class MarketData:
-    
+
+@task(
+    name="Get Market Data",
+    description="Download market data for given tickers and date range.",
+    tags=["market_data", "data_download"]
+)
+
+class MarketData:    
     @staticmethod
     def get_market_data(
         tickers: list[str],
@@ -16,7 +23,7 @@ class MarketData:
 
         logger = logging.getLogger("MarketData.Prices")
         logger.info("Starting market data download process.")
-        
+
         # ===== Validations ===== #
         # Tickers validation
         if not tickers or not isinstance(tickers, list):
