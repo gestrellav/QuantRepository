@@ -3,14 +3,7 @@ from typing import Union
 import yfinance as yf
 import logging
 from constants import PriceType
-from prefect import task
 
-
-@task(
-    name="Get Market Data",
-    description="Download market data for given tickers and date range.",
-    tags=["market_data", "data_download"]
-)
 
 class MarketData:    
     @staticmethod
